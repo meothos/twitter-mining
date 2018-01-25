@@ -1,0 +1,30 @@
+require(twitteR)
+require(RCurl)
+require(tm)
+require(wordcloud)
+
+consumer_key<-'name1'
+consumer_secret<-'name2'
+access_token<-'name3'
+access_secret<-'name4'
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+jt<-searchTwitter("matrix" , n=1000, lang="en")
+class(jt)
+jtt<-sapply(jt, function(x) x$getText())
+str(jtt)
+
+create corpus from vector of tweets
+jcorp<-Corpus(VectorSource(jtt))
+inspect(jcorp[1])
+
+clean text
+jclean<-tm_map(jcorp, removePunctuation)
+jclean<-tm_map(jclean, content_transformer(tolower))
+jclean<-tm_map(jclean, removeWords, stopwords("english"))
+jclean<-tm_map(jclean, removeNumbers)
+jclean<-tm_map(jclean, stripWhitespace)
+jclean<-tm_map(jclean, removeWords, c("matrix"))
+
+wordcloud(jclean, random.order = T, scale=c(3,1), max.words = 70, color=rainbow(50))
